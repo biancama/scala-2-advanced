@@ -1,6 +1,6 @@
 package exercises
 
-import scala.annotation.tailrec
+import scala.annotation.{tailrec}
 
 trait MySet[A] extends (A => Boolean) {
   /*
@@ -14,6 +14,24 @@ trait MySet[A] extends (A => Boolean) {
   def flatMap[B](f: A => MySet[B]): MySet[B]
   def filter(predicate: A => Boolean): MySet[A]
   def forEach(f: A => Unit): Unit
+  /*
+    EXERCISE #2
+    - removing an element
+    - intersection with another set
+    - difference with another set
+   */
+  def unary_! : MySet[A] = ???
+  def -(elem: A): MySet[A] = filter(x => x != elem)
+  def --(anotherSet: MySet[A]): MySet[A] = filter(!anotherSet)
+
+    //filter(x => !anotherSet.contains(x)) //filter(!anotherSet)
+  def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet)
+
+    /*
+    filter(x => anotherSet(x))
+
+    filter(x => anotherSet.contains(x))
+    */
 }
 object MySet {
   /*
@@ -45,6 +63,7 @@ class MyEmptySet[A] extends MySet[A] {
   override def filter(predicate: A => Boolean): MySet[A] = this
 
   override def forEach(f: A => Unit): Unit = ()
+
 }
 class MyNonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A] {
   override def contains(elem: A): Boolean = head == elem || tail.contains(elem)
