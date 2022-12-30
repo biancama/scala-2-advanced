@@ -17,7 +17,7 @@ object Intro extends App {
   // create a JVM thread => OS thread
 
   runnable.run() // doesn't do anything in parallel!
-  aThread.join() // blocks until aThread finishes running
+ // aThread.join() // blocks until aThread finishes running
 
 
   val threadHello = new Thread(() => (1 to 5).foreach(_ => println("hello")))
@@ -89,15 +89,15 @@ object Intro extends App {
 
   }
 
-  for (_ <- 1 to 10000) {
-    val account = new BankAccount(50000)
-    val thread1 = new Thread(() => account.buy(account, "shoes", 3000))
-    val thread2 = new Thread(() => account.buy(account, "iPhone12", 4000))
-
-    thread1.start()
-    thread2.start()
-    Thread.sleep(10)
-    if (account.amount != 43000) println("AHA: " + account.amount)
+//  for (_ <- 1 to 10000) {
+//    val account = new BankAccount(50000)
+//    val thread1 = new Thread(() => account.buy(account, "shoes", 3000))
+//    val thread2 = new Thread(() => account.buy(account, "iPhone12", 4000))
+//
+//    thread1.start()
+//    thread2.start()
+//    Thread.sleep(10)
+//    if (account.amount != 43000) println("AHA: " + account.amount)
 //    println()
     /*
         thread1 (shoes): 50000
@@ -105,7 +105,7 @@ object Intro extends App {
         thread2 (iphone): 50000
           - account = 50000 - 4000 = 46000 overwrites the memory of account.amount
        */
-  }
+//  }
 
   /**
    * Exercises
@@ -116,6 +116,18 @@ object Intro extends App {
    * in REVERSE ORDER
    *
    */
+
+  def inceptionThreads(max: Int, i: Int = 1): Thread = new Thread(() => {
+    if (max > 1) {
+      val newThread = inceptionThreads(max - 1, i + 1)
+      newThread.start()
+      newThread.join()
+    }
+    println(s"hello from thread #$i")
+
+  })
+
+  inceptionThreads(50).start()
   /*
       2
      */
@@ -126,6 +138,12 @@ object Intro extends App {
 /*
     1) what is the biggest value possible for x? 100
     2) what is the SMALLEST value possible for x? 1
+
+thread1: x = 0
+    thread2: x = 0
+      ...
+    thread100: x = 0
+    for all threads: x = 1 and write it back to x
 */
 
   /*
@@ -141,11 +159,27 @@ object Intro extends App {
   message = "Scala sucks"
   awesomeThread.start()
   Thread.sleep(1001)
-  awesomeThread.join() // wait for the awesome thread to join
+  awesomeThread.join() // wait for the awesome thread to join   THIS IS ONLY SOLUTION
   println(message)
 
 /*
     what's the value of message? almost always "Scala is awesome"
-    is it guaranteed?
+    is it guaranteed? NO
+
+why? why not?
+    (main thread)
+      message = "Scala sucks"
+      awesomeThread.start()
+      sleep() - relieves execution
+    (awesome thread)
+      sleep() - relieves execution
+    (OS gives the CPU to some important thread - takes CPU for more than 2 seconds)
+    (OS gives the CPU back  to the MAIN thread)
+      println("Scala sucks")
+    (OS gives the CPU to awesomethread)
+      message = "Scala is awesome"
 */
+
+  // how do we fix this?
+  // syncrhonizing does NOT work
 }
