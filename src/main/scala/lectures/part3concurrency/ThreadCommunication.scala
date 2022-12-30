@@ -148,7 +148,7 @@ object ThreadCommunication extends App {
             notifies ONE consumer, notifies on buffer
             notifies the other consumer
            */
-          while (buffer.isEmpty) {
+          while (buffer.isEmpty) { // while it is need because even consumer can notify a consumer
             println(s"[consumer $id] buffer empty, waiting...")
             buffer.wait()
           }
@@ -200,4 +200,34 @@ object ThreadCommunication extends App {
   }
 
   multiProdCons(3, 3)
+
+  /*
+      Exercises.
+      1) think of an example where notifyALL acts in a different way than notify?
+      2) create a deadlock
+      3) create a livelock
+     */
+// notify All pub sub scribers
+
+  // notifyall
+  def testNotifyAll(): Unit = {
+    val bell = new Object
+
+    (1 to 10).foreach(i => new Thread(() => {
+      bell.synchronized {
+        println(s"[thread $i] waiting...")
+        bell.wait()
+        println(s"[thread $i] hooray!")
+      }
+    }).start())
+
+    new Thread(() => {
+      Thread.sleep(2000)
+      println("[announcer] Rock'n roll!")
+      bell.synchronized {
+        bell.notify()
+      }
+    }).start()
+  }
+  // testNotifyAll()
 }
