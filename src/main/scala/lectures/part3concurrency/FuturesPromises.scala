@@ -171,9 +171,9 @@ object FuturesPromises extends App {
     val promise = Promise[A]
     fa.onComplete(res => promise.tryComplete(res))
     fb.onComplete(promise.tryComplete)
-    
+
     /*
-      this is equivalent 
+      this is equivalent
     fa.onComplete {
       case Success(r) => try {  we need a try because the promise can be already completed
         promise.success(r)
@@ -221,7 +221,7 @@ object FuturesPromises extends App {
   // retry until
   def retryUntil[A](action: () => Future[A], condition: A => Boolean): Future[A] =
     action()
-      .filter(condition)
+      .filter(condition)(ExecutionContext.fromExecutor(Executors.newFixedThreadPool(8)))
       .recoverWith {
         case _ => retryUntil(action, condition)
       }
