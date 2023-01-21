@@ -1,7 +1,7 @@
 package exercises
 
 
-import scala.annotation.tailrec
+import scala.annotation.{tailrec, targetName}
 
 abstract class MyStream[+A] {
   def isEmpty: Boolean
@@ -12,6 +12,7 @@ abstract class MyStream[+A] {
       val s = new Cons(1, EmptyStream)
       val prepended = 1 #:: s = new Cons(1, s)
      */
+  @targetName("#::")
   def #::[B >: A](element: B): MyStream[B] = new Cons[B](element, this) // prepend operator
   def ++[B >: A](anotherStream: => MyStream[B]): MyStream[B] // concatenate two streams
   def foreach(f: A => Unit): Unit
